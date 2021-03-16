@@ -1,0 +1,4 @@
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/toowoxx/go-lib-fs v1.0.0 h1:y9Qpg9ZH10Zx7hPcLg9+NMTB4sRvQ76zGhQ6PBtohDE=
+github.com/toowoxx/go-lib-fs v1.0.0/go.mod h1:IdwOcsJSdJqyrwM2xyzjXs71lbwBn34DGT89sXb0xIY=
