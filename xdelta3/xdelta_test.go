@@ -38,12 +38,9 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foundDiff, err := Delta(inTestDir("test.original"), inTestDir("test.target"), inTestDir("test.delta"))
+	err = Delta(inTestDir("test.original"), inTestDir("test.target"), inTestDir("test.delta"))
 	if err != nil {
 		t.Fatal(err)
-	}
-	if !foundDiff {
-		t.Fatal("expected xdelta to find a difference")
 	}
 
 	output, err := Info(inTestDir("test.delta"))

@@ -10,24 +10,21 @@ import (
 	"github.com/toowoxx/go-lib-userspace-common/cmds"
 )
 
-func Delta(sourceFile, targetFile, deltaFile string) (foundDiff bool, err error) {
+func Delta(sourceFile, targetFile, deltaFile string) (err error) {
 	if !fs.FileExists(sourceFile) {
-		return false, errors.New(fmt.Sprintf("source file %s does not exist", sourceFile))
+		return errors.New(fmt.Sprintf("source file %s does not exist", sourceFile))
 	}
 	if !fs.FileExists(targetFile) {
-		return false, errors.New(fmt.Sprintf("target file %s does not exist", sourceFile))
+		return errors.New(fmt.Sprintf("target file %s does not exist", sourceFile))
 	}
-	exitCode, err := cmds.RunCommandReturnExitStatus(
-		"xdelta", "delta", sourceFile, targetFile, deltaFile,
+	err = cmds.RunCommand(
+		"xdelta3", "-s", sourceFile, targetFile, deltaFile,
 	)
-	if exitCode == 1 {
-		foundDiff = true
-		err = nil
-	} else if err != nil {
-		return false, errors.Wrap(err, "could not run xdelta delta command")
+	if err != nil {
+		return errors.Wrap(err, "could not run xdelta delta command")
 	}
 	if !fs.FileExists(deltaFile) {
-		return foundDiff, errors.New("command ran successfully but did not produce delta file")
+		return errors.New("command ran successfully but did not produce delta file")
 	}
 	return
 }
@@ -40,7 +37,7 @@ func Patch(deltaFile, sourceFile, targetFile string) error {
 		return errors.New(fmt.Sprintf("delta file %s does not exist", sourceFile))
 	}
 	err := cmds.RunCommand(
-		"xdelta", "patch", deltaFile, sourceFile, targetFile,
+		"xdelta3", "-d", "-s", sourceFile, deltaFile, targetFile,
 	)
 	if err != nil {
 		return errors.Wrap(err, "could not run xdelta patch command")
@@ -55,7 +52,7 @@ func Info(deltaFile string) (string, error) {
 	if !fs.FileExists(deltaFile) {
 		return "", errors.New(fmt.Sprintf("delta file %s does not exist", deltaFile))
 	}
-	output, err := exec.Command("xdelta", "info", deltaFile).CombinedOutput()
+	output, err := exec.Command("xdelta3", "printdelta", deltaFile).CombinedOutput()
 	if err != nil {
 		return "", errors.Wrap(err, "could not run xdelta info command")
 	}
