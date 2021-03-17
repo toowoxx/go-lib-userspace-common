@@ -2,6 +2,7 @@ package xdelta3
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -15,6 +16,7 @@ func inTestDir(file string) string {
 }
 
 func TestAll(t *testing.T) {
+	_ = os.RemoveAll(testDataDir)
 	defer func() {
 		_ = os.RemoveAll(testDataDir)
 	}()
@@ -44,6 +46,31 @@ func TestAll(t *testing.T) {
 	}
 
 	output, err := Info(inTestDir("test.delta"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(output)
+
+	inputFile, err := os.Open(inTestDir("test.target"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r, err := DeltaStream(inTestDir("test.original"), inputFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	outputFile, err := os.OpenFile(inTestDir("test2.delta"), os.O_CREATE|os.O_WRONLY, 0600)
+	_, err = io.Copy(outputFile, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = r.Close()
+	inputFile.Close()
+	outputFile.Close()
+
+	output, err = Info(inTestDir("test2.delta"))
 	if err != nil {
 		t.Fatal(err)
 	}

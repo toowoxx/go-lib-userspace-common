@@ -2,6 +2,7 @@ package xdelta3
 
 import (
 	"fmt"
+	"io"
 	"os/exec"
 
 	"github.com/pkg/errors"
@@ -27,6 +28,29 @@ func Delta(sourceFile, targetFile, deltaFile string) (err error) {
 		return errors.New("command ran successfully but did not produce delta file")
 	}
 	return
+}
+func DeltaStream(sourceFile string, r io.Reader) (io.ReadCloser, error) {
+	if !fs.FileExists(sourceFile) {
+		return nil, errors.New(fmt.Sprintf("source file %s does not exist", sourceFile))
+	}
+
+	cmd := exec.Command("xdelta3", "-s", sourceFile)
+
+	pipeR, pipeW := io.Pipe()
+	cmd.Stdin = r
+	cmd.Stdout = pipeW
+
+	err := cmd.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+		_ = cmd.Wait()
+		_ = pipeW.Close()
+	}()
+
+	return pipeR, nil
 }
 
 func Patch(deltaFile, sourceFile, targetFile string) error {
