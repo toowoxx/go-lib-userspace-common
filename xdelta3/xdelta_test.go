@@ -1,4 +1,4 @@
-package xdelta
+package xdelta3
 
 import (
 	"fmt"
