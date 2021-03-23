@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"io"
 	"os"
 	"os/exec"
 )
@@ -26,4 +27,29 @@ func RunCommandReturnExitStatus(path string, args ...string) (int, error) {
 		}
 	}
 	return 0, nil
+}
+
+func StartCommandWithPipes(cmd *exec.Cmd, input io.Reader) (io.ReadCloser, chan error, error) {
+	pipeR, pipeW := io.Pipe()
+	cmd.Stdin = input
+	cmd.Stdout = pipeW
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Start()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	errChan := make(chan error)
+
+	go func() {
+		err := cmd.Wait()
+		_ = pipeW.Close()
+		if err != nil {
+			errChan <- err
+		}
+		close(errChan)
+	}()
+
+	return pipeR, errChan, nil
 }

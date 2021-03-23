@@ -56,7 +56,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := DeltaStream(inTestDir("test.original"), inputFile)
+	r, errChan, err := DeltaStream(inTestDir("test.original"), inputFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,9 +66,11 @@ func TestAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_ = r.Close()
 	inputFile.Close()
 	outputFile.Close()
+	if err, hasErr := <-errChan; hasErr {
+		t.Fatal(err)
+	}
 
 	output, err = Info(inTestDir("test2.delta"))
 	if err != nil {

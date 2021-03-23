@@ -29,28 +29,15 @@ func Delta(sourceFile, targetFile, deltaFile string) (err error) {
 	}
 	return
 }
-func DeltaStream(sourceFile string, r io.Reader) (io.ReadCloser, error) {
+
+func DeltaStream(sourceFile string, r io.Reader) (io.ReadCloser, chan error, error) {
 	if !fs.FileExists(sourceFile) {
-		return nil, errors.New(fmt.Sprintf("source file %s does not exist", sourceFile))
+		return nil, nil, errors.New(fmt.Sprintf("source file %s does not exist", sourceFile))
 	}
 
 	cmd := exec.Command("xdelta3", "-s", sourceFile)
 
-	pipeR, pipeW := io.Pipe()
-	cmd.Stdin = r
-	cmd.Stdout = pipeW
-
-	err := cmd.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	go func() {
-		_ = cmd.Wait()
-		_ = pipeW.Close()
-	}()
-
-	return pipeR, nil
+	return cmds.StartCommandWithPipes(cmd, r)
 }
 
 func Patch(deltaFile, sourceFile, targetFile string) error {
