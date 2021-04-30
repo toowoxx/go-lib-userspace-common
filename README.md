@@ -1,4 +1,6 @@
 # go-lib-userspace-common
+[![Build](https://github.com/toowoxx/go-lib-userspace-common/actions/workflows/go.yml/badge.svg)](https://github.com/toowoxx/go-lib-userspace-common/actions/workflows/go.yml)
+
 Utility functions used to interface with userspace, typically on Linux distributions and other unices.
 
 ## License
