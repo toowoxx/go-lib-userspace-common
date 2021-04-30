@@ -1,0 +1,31 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+      volumes:
+        - ${{ github.workspace }}:/src
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - run: |
+        set -euo pipefail
+        pacman -Syu --noconfirm --needed xdelta3 tar go openssh wget
+        pushd /tmp
+        wget 'https://github.com/toowoxx/pkgbuild-xdelta/releases/download/v1.1.4-7/xdelta-1.1.4-7-x86_64.pkg.tar.zst' -O xdelta.pkg.tar.zst
+        wget 'https://github.com/toowoxx/pkgbuild-glib/releases/download/v1.2.10-16/glib-1.2.10-16-x86_64.pkg.tar.zst' -O glib.pkg.tar.zst
+        pacman --noconfirm -U glib.pkg.tar.zst
+        pacman --noconfirm -U xdelta.pkg.tar.zst
+        popd
+        pushd /src
+        go test -v './...'
+        popd
