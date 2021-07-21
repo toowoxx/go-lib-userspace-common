@@ -14,6 +14,17 @@ func RunCommand(path string, args ...string) error {
 	return cmd.Run()
 }
 
+func RunCommandWithEnv(path string, env map[string]string, args ...string) error {
+	cmd := exec.Command(path, args...)
+	for key, value := range env {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+	}
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func RunCommandReturnExitStatus(path string, args ...string) (int, error) {
 	cmd := exec.Command(path, args...)
 	cmd.Stdin = os.Stdin
