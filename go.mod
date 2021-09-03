@@ -1,6 +1,6 @@
 module github.com/toowoxx/go-lib-userspace-common
 
-go 1.16
+go 1.17
 
 require (
 	github.com/alessio/shellescape v1.4.1
