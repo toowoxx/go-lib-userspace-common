@@ -30,6 +30,14 @@ func RunCommandInDirWithEnvReturnOutput(name string, dir string, env map[string]
 	return cmd.Output()
 }
 
+func RunCommandInDirReturnOutput(name string, dir string, params ...string) ([]byte, error) {
+	cmd := exec.Command(name, params...)
+	if dir != "." {
+		cmd.Dir = dir
+	}
+	return cmd.Output()
+}
+
 func RunCommandWithEnvReturnOutput(path string, env map[string]string, args ...string) ([]byte, error) {
 	cmd := exec.Command(path, args...)
 	for key, value := range env {
